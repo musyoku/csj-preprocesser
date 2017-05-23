@@ -39,7 +39,6 @@ def parse_file(filename, dirname, out_dir):
 				header = header.strip()
 				headers.append(header)
 				skip = False
-				print(header)
 
 			# 人名は除外
 			patterns = [ur"×", ur"笑", ur"泣", ur"咳"]
@@ -135,7 +134,6 @@ def parse_file(filename, dirname, out_dir):
 				continue
 
 			sentences.append(jaconv.kata2hira(katakana))
-			print(sentences[-1])
 
 	# 最後の1ブロックはループから漏れるので明示的に書き込む
 	if sentences > 0 and skip == False:
