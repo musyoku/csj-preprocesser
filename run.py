@@ -41,6 +41,8 @@ def parse(dirname, out_dir):
 					header = line.strip()
 					if re.search(r"[RL]", header) is None:
 						header += "S:"	# stereo
+					header = re.sub(r"^[0-9]{4}", "", header)
+					header = header.strip()
 					headers.append(header)
 					skip = False
 
