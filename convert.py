@@ -5,7 +5,7 @@ import argparse, os, codecs, re, jaconv
 
 def parse_file(filename, dirname, out_dir):
 	with codecs.open(os.path.join(dirname, filename), "r", "shift_jis") as f:
-		print("loading {} ...".format(filename))
+		print("converting {} ...".format(filename))
 		MODE_READING = 1
 		MODE_END = 2
 		sentences = []
