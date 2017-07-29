@@ -1,7 +1,7 @@
 # coding: utf-8
 from __future__ import print_function
 from six.moves import xrange
-import argparse, os, codecs, re, jaconv
+import argparse, os, codecs, re
 
 def parse_file(filename, dirname, out_dir):
 	with codecs.open(os.path.join(dirname, filename), "r", "shift_jis") as f:
@@ -65,6 +65,7 @@ def parse_file(filename, dirname, out_dir):
 				if match:
 					while(match):
 						candidate = match.group(1).strip()
+						candidate = candidate.split(",")[0]
 						sentence = sentence.replace(match.group(0), candidate)
 						match = re.search(pattern, sentence)
 				return sentence
@@ -84,14 +85,15 @@ def parse_file(filename, dirname, out_dir):
 				match = re.search(pattern, sentence)
 				if match:
 					while(match):
-						candidate = match.group(1).split(";")[-1]
+						candidate = match.group(1).split(";")[0]
 						sentence = sentence.replace(match.group(0), candidate)
 						match = re.search(pattern, sentence)
 				return sentence
+
 			tags = ["?", "F", "L", "D2", "D", "X", "M", "O", u"咳", u"笑", u"泣"]
 
 			_replaced = katakana
-			while True:
+			while True:	# ()がなくなるまで繰り返す
 				_original = _replaced
 
 				# (W)の処理
@@ -125,7 +127,7 @@ def parse_file(filename, dirname, out_dir):
 
 			katakana = re.sub(r"\)", "", katakana)
 
-			if re.search(ur"[a-zA-Z0-9\(\)<>×]", katakana):
+			if re.search(ur"[a-zA-Z0-9\(\)<>×,]", katakana):
 				print(line, ";", katakana)
 				raise Exception()
 
@@ -133,7 +135,7 @@ def parse_file(filename, dirname, out_dir):
 			if len(katakana) == 0:
 				continue
 
-			sentences.append(jaconv.kata2hira(katakana))
+			sentences.append(katakana)
 
 	# 最後の1ブロックはループから漏れるので明示的に書き込む
 	if sentences > 0 and skip == False:
@@ -154,19 +156,19 @@ def parse(dirname, out_dir):
 		parse_file(filename, dirname, out_dir)
 
 
-def main(args):
+def main():
 	assert args.csj_dir
 	assert args.out_dir
 	try:
 		os.mkdir(args.out_dir)
 	except:
 		pass
-
+		
 	trn_dir = args.csj_dir + "/TRN/Form1"
 
 	# debug
-	if args.csj_filename:
-		parse_file(args.csj_filename, os.path.join(trn_dir, "core"), os.path.join(args.out_dir, "core"))
+	if args.filename:
+		parse_file(args.filename, os.path.join(trn_dir, "core"), os.path.join(args.out_dir, "core"))
 		return
 
 	parse(os.path.join(trn_dir, "core"), os.path.join(args.out_dir, "core"))
@@ -177,6 +179,6 @@ if __name__ == "__main__":
 	parser = argparse.ArgumentParser()
 	parser.add_argument("--csj-dir", "-csj", type=str, default=None)
 	parser.add_argument("--out-dir", "-out", type=str, default=None)
-	parser.add_argument("--csj-filename", "-file", type=str, default=None)
+	parser.add_argument("--filename", "-file", type=str, default=None)
 	args = parser.parse_args()
-	main(args)
+	main()
